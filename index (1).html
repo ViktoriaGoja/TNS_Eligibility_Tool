@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Eligibility Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #F5F4F0; min-height: 100vh; display: flex; justify-content: center; padding: 2rem 1rem 4rem; color: #3B3B3B; }
+    .container { width: 100%; max-width: 580px; }
+    .field-label { font-size: 11px; font-weight: 600; color: #3B3B3B; letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 8px; display: block; }
+    .field-group { margin-bottom: 1.25rem; }
+    input[type=date] { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 10px 12px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: #3B3B3B; outline: none; background: #fff; transition: border-color 0.15s; }
+    input[type=date]:focus { border-color: #F58A21; }
+    .seg { display: flex; gap: 10px; }
+    .seg-btn { flex: 1; text-align: center; padding: 11px; border-radius: 8px; border: 1px solid #ddd; background: transparent; color: #888; font-size: 14px; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.15s; }
+    .seg-btn.active-orange { border: 2px solid #F58A21; background: #FEF3E4; color: #C46D10; font-weight: 600; }
+    .seg-btn.active-blue { border: 2px solid #29A3BD; background: #E0F4FA; color: #1A7A96; font-weight: 600; }
+    .divider-label { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .divider-label span { font-size: 11px; font-weight: 600; color: #3B3B3B; letter-spacing: 0.07em; text-transform: uppercase; white-space: nowrap; }
+    .divider-label::before, .divider-label::after { content: ''; flex: 1; height: 1px; background: #ddd; }
+    .card { border-radius: 10px; border: 1px solid #ddd; overflow: hidden; margin-bottom: 12px; }
+    .card-header { background: #3B3B3B; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; }
+    .card-header-title { font-size: 12px; font-weight: 600; color: #fff; text-transform: uppercase; letter-spacing: 0.06em; }
+    .card-body { padding: 14px 16px; background: #fff; }
+    .bullet-row { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: #3B3B3B; margin-bottom: 8px; }
+    .bullet-row:last-child { margin-bottom: 0; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+    .check { font-size: 15px; line-height: 1.2; flex-shrink: 0; }
+    .tab-bar { display: flex; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; margin-bottom: 12px; overflow-x: auto; }
+    .tab-btn { flex: 1; min-width: 70px; text-align: center; padding: 10px 8px; font-size: 12px; font-weight: 500; cursor: pointer; background: transparent; color: #888; border-left: 1px solid #ddd; font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap; }
+    .tab-btn:first-child { border-left: none; }
+    .tab-btn.active { background: #3B3B3B; color: #fff; font-weight: 600; }
+    .fee-tab-bar { display: flex; border-bottom: 1px solid #eee; }
+    .fee-tab { flex: 1; text-align: center; padding: 9px; font-size: 13px; cursor: pointer; background: transparent; color: #888; border-right: 1px solid #eee; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+    .fee-tab:last-child { border-right: none; }
+    .fee-tab.active { background: #FEF3E4; color: #C46D10; font-weight: 600; }
+    .kv-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
+    .kv-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .info-box { border-radius: 8px; padding: 10px 12px; border: 1px solid; display: flex; align-items: flex-start; gap: 8px; font-size: 12px; margin-top: 8px; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div style="display:flex; align-items:center; gap:12px; margin-bottom:2rem;">
+    <div style="width:42px; height:42px; border-radius:10px; background:#F58A21; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="13" width="4" height="8" rx="1" fill="white"/><rect x="10" y="8" width="4" height="13" rx="1" fill="white"/><rect x="17" y="3" width="4" height="18" rx="1" fill="white"/></svg>
+    </div>
+    <div>
+      <div style="font-size:17px; font-weight:600; color:#3B3B3B;">Student Eligibility Calculator</div>
+      <div style="font-size:12px; color:#888; margin-top:2px;">Testing eligibility, policies &amp; outcomes — CT &amp; MA</div>
+    </div>
+  </div>
+
+  <div class="field-group">
+    <span class="field-label">State</span>
+    <div class="seg">
+      <div id="btn-ct" class="seg-btn active-orange" onclick="setState('CT')">Connecticut</div>
+      <div id="btn-ma" class="seg-btn" onclick="setState('MA')">Massachusetts</div>
+    </div>
+  </div>
+
+  <div class="field-group">
+    <span class="field-label">Date of birth</span>
+    <input type="date" id="dob" onchange="calculate()" />
+  </div>
+
+  <div class="field-group">
+    <span class="field-label">Permit issued date</span>
+    <input type="date" id="permit-date" onchange="calculate()" />
+  </div>
+
+  <div id="course-group" class="field-group">
+    <span class="field-label">Course type</span>
+    <div class="seg">
+      <div id="btn-full" class="seg-btn active-orange" onclick="setCourse('full')">Full course</div>
+      <div id="btn-8hr" class="seg-btn" onclick="setCourse('8hr')">8-hour course</div>
+    </div>
+    <div id="course-note" style="font-size:12px; color:#aaa; margin-top:6px;"></div>
+  </div>
+
+  <div id="result-area"></div>
+
+  <div id="policy-section" class="hidden" style="margin-top:1.75rem;">
+
+    <!-- CT -->
+    <div id="ct-policies" class="hidden">
+      <div class="divider-label"><span>CT @ TNS</span></div>
+      <div class="tab-bar">
+        <div id="ct-tab-state" class="tab-btn active" onclick="setCTTab('state')">State reqs</div>
+        <div id="ct-tab-tns" class="tab-btn" onclick="setCTTab('tns')">TNS policy</div>
+        <div id="ct-tab-fees" class="tab-btn" onclick="setCTTab('fees')">Fees</div>
+        <div id="ct-tab-pass" class="tab-btn" onclick="setCTTab('pass')">If passed</div>
+        <div id="ct-tab-fail" class="tab-btn" onclick="setCTTab('fail')">If failed</div>
+      </div>
+
+      <div id="ct-content-state">
+        <div class="card">
+          <div class="card-header" onclick="toggleAcc('ct-teen')">
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:20px;height:20px;border-radius:50%;background:#F58A21;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="white"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div><span class="card-header-title">Teens — under 18</span></div>
+            <span id="ct-teen-chev" style="color:#aaa;font-size:18px;line-height:1;">+</span>
+          </div>
+          <div id="ct-teen" class="hidden" style="padding:12px 14px;background:#FFFAF4;">
+            <div class="bullet-row"><span class="check" style="color:#F58A21;">&#10003;</span><span><strong>Full course</strong> → 120-day permit hold (30 hrs classroom + 8 hrs in-car)</span></div>
+            <div class="bullet-row"><span class="check" style="color:#F58A21;">&#10003;</span><span><strong>8-hour course</strong> → 180-day permit hold (8 hrs classroom only)</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header" onclick="toggleAcc('ct-adult')">
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:20px;height:20px;border-radius:50%;background:#29A3BD;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="white"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div><span class="card-header-title">Adults — 18 and over</span></div>
+            <span id="ct-adult-chev" style="color:#aaa;font-size:18px;line-height:1;">+</span>
+          </div>
+          <div id="ct-adult" class="hidden" style="padding:12px 14px;background:#F0F8FB;">
+            <div class="bullet-row"><span class="check" style="color:#29A3BD;">&#10003;</span><span>Min. <strong>8-hour course</strong> required — <strong>90-day</strong> permit hold</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="ct-content-tns" class="hidden">
+        <div class="card">
+          <div style="background:#3B3B3B;padding:10px 14px;display:flex;align-items:center;gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4" stroke="#F58A21" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="#F58A21" stroke-width="2" stroke-linecap="round"/></svg><span class="card-header-title">TNS requirement</span></div>
+          <div class="card-body" style="font-size:13px;color:#3B3B3B;">All students testing with TNS must complete at least <strong>one 2-hour driving lesson</strong> prior to their test date.</div>
+        </div>
+        <div class="card">
+          <div class="card-header" onclick="toggleAcc('ct-deadline')">
+            <div style="display:flex;align-items:center;gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 8v4l3 3" stroke="#29A3BD" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="#29A3BD" stroke-width="2"/></svg><span class="card-header-title">Deadline calculator</span></div>
+            <span id="ct-deadline-chev" style="color:#aaa;font-size:18px;line-height:1;">+</span>
+          </div>
+          <div id="ct-deadline" class="hidden" style="padding:14px;background:#F0F8FB;">
+            <span class="field-label" style="margin-bottom:6px;">Scheduled test date <span style="font-weight:400;color:#aaa;text-transform:none;letter-spacing:0;">(optional)</span></span>
+            <input type="date" id="test-date-ct" onchange="calcCTPolicy()" style="border-color:#29A3BD;" onfocus="this.style.borderColor='#1A7A96'" onblur="this.style.borderColor='#29A3BD'" />
+            <div id="ct-deadline-result" style="margin-top:10px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="ct-content-fees" class="hidden">
+        <div class="card">
+          <div style="background:#3B3B3B;padding:10px 14px;"><span class="card-header-title">Fees</span></div>
+          <div class="fee-tab-bar">
+            <div id="ct-fee-tab-test" class="fee-tab active" onclick="setCTFeeTab('test')">License test</div>
+            <div id="ct-fee-tab-retest" class="fee-tab" onclick="setCTFeeTab('retest')">Retest</div>
+            <div id="ct-fee-tab-cancel" class="fee-tab" onclick="setCTFeeTab('cancel')">Cancellation</div>
+          </div>
+          <div id="ct-fee-test" class="card-body"><div style="font-size:28px;font-weight:600;color:#3B3B3B;margin-bottom:4px;">$150</div><div style="font-size:13px;color:#888;">Standard service fee</div></div>
+          <div id="ct-fee-retest" class="card-body hidden"><div style="font-size:28px;font-weight:600;color:#3B3B3B;margin-bottom:4px;">$190</div><div style="font-size:13px;color:#888;">Includes $40 DMV fee</div></div>
+          <div id="ct-fee-cancel" class="card-body hidden">
+            <div class="kv-row"><span style="color:#888;">Cancel by</span><span style="font-weight:600;">5 days via Student Portal</span></div>
+            <div class="kv-row"><span style="color:#888;">Late cancellation</span><span style="font-weight:600;color:#E24B4A;">$100 (incl. $40 DMV fee)</span></div>
+            <div class="kv-row"><span style="color:#888;">No-show</span><span style="font-weight:600;color:#E24B4A;">Forfeit + $40 DMV fee</span></div>
+            <div class="kv-row"><span style="color:#888;">Required items</span><span style="font-weight:600;">Per Driving Lesson Policy</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="ct-content-pass" class="hidden">
+        <div style="border:1px solid #73BF45;border-radius:10px;overflow:hidden;">
+          <div style="background:#3B3B3B;padding:10px 14px;display:flex;align-items:center;gap:8px;"><div style="width:20px;height:20px;border-radius:50%;background:#73BF45;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;">&#10003;</div><span class="card-header-title">If passed — CT</span></div>
+          <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;background:#F4FBF0;">
+            <div class="bullet-row"><div class="dot" style="background:#73BF45;"></div><span>You will receive a <strong>flyer from the DMV agent</strong> explaining how to pay for and receive your physical license.</span></div>
+            <div class="bullet-row"><div class="dot" style="background:#73BF45;"></div><span>The DMV agent will issue a <strong>temporary license valid for 20 days</strong> — purchase your real license the next day as it takes <strong>5–7 business days</strong> to arrive.</span></div>
+            <div class="bullet-row"><div class="dot" style="background:#73BF45;"></div><span>No further paperwork or contact with TNS is required.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="ct-content-fail" class="hidden">
+        <div style="border:1px solid #E24B4A;border-radius:10px;overflow:hidden;">
+          <div style="background:#3B3B3B;padding:10px 14px;display:flex;align-items:center;gap:8px;"><div style="width:20px;height:20px;border-radius:50%;background:#E24B4A;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:600;">&#10007;</div><span class="card-header-title">If failed — CT</span></div>
+          <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;background:#FFF5F5;">
+            <div class="bullet-row"><div class="dot" style="background:#E24B4A;"></div><span>Must wait <strong>14 days from the test date</strong> before retesting.</span></div>
+            <div class="bullet-row"><div class="dot" style="background:#E24B4A;"></div><span><strong>Retest fee: $190</strong> (includes $40 DMV fee).</span></div>
+          </div>
+          <div style="padding:12px 16px;background:#fff;border-top:1px solid #f5c6c6;">
+            <span class="field-label" style="margin-bottom:6px;">Retest date calculator</span>
+            <input type="date" id="ct-fail-date" onchange="calcCTRetest()" onfocus="this.style.borderColor='#E24B4A'" onblur="this.style.borderColor='#ddd'" />
+            <div id="ct-retest-result" style="margin-top:8px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MA -->
+    <div id="ma-policies" class="hidden">
+      <div class="divider-label"><span>MA @ TNS</span></div>
+      <div class="tab-bar">
+        <div id="ma-tab-state" class="tab-btn active" onclick="setMATab('state')">State reqs</div>
+        <div id="ma-tab-tns" class="tab-btn" onclick="setMATab('tns')">TNS policy</div>
+        <div id="ma-tab-fees" class="tab-btn" onclick="setMATab('fees')">Fees</div>
+        <div id="ma-tab-pass" class="tab-btn" onclick="setMATab('pass')">If passed</div>
+        <div id="ma-tab-fail" class="tab-btn" onclick="setMATab('fail')">If failed</div>
+      </div>
+
+      <div id="ma-content-state">
+        <div class="card">
+          <div class="card-header" onclick="toggleAcc('ma-teen')">
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:20px;height:20px;border-radius:50%;background:#F58A21;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="white"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div><span class="card-header-title">Teens — under 18</span></div>
+            <span id="ma-teen-chev" style="color:#aaa;font-size:18px;line-height:1;">+</span>
+          </div>
+          <div id="ma-teen" class="hidden" style="padding:12px 14px;background:#FFFAF4;">
+            <div class="bullet-row"><span class="check" style="color:#F58A21;">&#10003;</span><span>Permit held for <strong>6 months (184 days)</strong> from issue date</span></div>
+            <div class="bullet-row"><span class="check" style="color:#F58A21;">&#10003;</span><span>Must be at least <strong>16½ years old</strong></span></div>
+            <div class="bullet-row"><span class="check" style="color:#F58A21;">&#10003;</span><span><strong>Full Driver's Ed:</strong> 30 hrs classroom, 12 hrs behind-the-wheel, 6 hrs observation</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header" onclick="toggleAcc('ma-adult')">
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:20px;height:20px;border-radius:50%;background:#29A3BD;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="white"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div><span class="card-header-title">Adults — 18 and over</span></div>
+            <span id="ma-adult-chev" style="color:#aaa;font-size:18px;line-height:1;">+</span>
+          </div>
+          <div id="ma-adult" class="hidden" style="padding:12px 14px;background:#F0F8FB;">
+            <div class="bullet-row"><span class="check" style="color:#29A3BD;">&#10003;</span><span>Must hold a <strong>valid learner's permit</strong></span></div>
+            <div class="bullet-row"><span style="color:#888;flex-shrink:0;">&#8212;</span><span style="color:#888;">No mandatory permit hold period</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="ma-content-tns" class="hidden">
+        <div class="card">
+          <div style="background:#3B3B3B;padding:10px 14px;display:flex;align-items:center;gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4" stroke="#F58A21" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="#F58A21" stroke-width="2" stroke-linecap="round"/></svg><span class="card-header-title">TNS requirement</span></div>
+          <div class="card-body" style="font-size:13px;color:#3B3B3B;">All students testing with TNS must complete at least <strong>one 2-hour driving lesson</strong> prior to their test date.</div>
+        </div>
+        <div class="card">
+          <div class="card-header" onclick="toggleAcc('ma-deadline')">
+            <div style="display:flex;align-items:center;gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 8v4l3 3" stroke="#29A3BD" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="#29A3BD" stroke-width="2"/></svg><span class="card-header-title">Deadline calculator</span></div>
+            <span id="ma-deadline-chev" style="color:#aaa;font-size:18px;line-height:1;">+</span>
+          </div>
+          <div id="ma-deadline" class="hidden" style="padding:14px;background:#F0F8FB;">
+            <span class="field-label" style="margin-bottom:6px;">Test type</span>
+            <div class="seg" style="margin-bottom:12px;">
+              <div id="btn-tns" class="seg-btn active-blue" onclick="setMATestType('tns')" style="padding:9px;font-size:13px;">Test @ TNS</div>
+              <div id="btn-rmv" class="seg-btn" onclick="setMATestType('rmv')" style="padding:9px;font-size:13px;">Meet @ RMV</div>
+            </div>
+            <span class="field-label" style="margin-bottom:4px;">Scheduled test date <span style="font-weight:400;color:#aaa;text-transform:none;letter-spacing:0;">(optional)</span></span>
+            <div id="ma-day-warning" style="font-size:12px;color:#1A7A96;margin-bottom:6px;">Tests @ TNS are on Saturdays or Mondays.</div>
+            <input type="date" id="test-date-ma" onchange="calcMAPolicy()" style="border-color:#29A3BD;" onfocus="this.style.borderColor='#1A7A96'" onblur="this.style.borderColor='#29A3BD'" />
+            <div id="ma-deadline-result" style="margin-top:10px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="ma-content-fees" class="hidden">
+        <div class="card">
+          <div style="background:#3B3B3B;padding:10px 14px;"><span class="card-header-title">Fees</span></div>
+          <div class="fee-tab-bar">
+            <div id="ma-fee-tab-tns" class="fee-tab active" onclick="setMAFeeTab('tns')">Test @ TNS</div>
+            <div id="ma-fee-tab-rmv" class="fee-tab" onclick="setMAFeeTab('rmv')">Meet @ RMV</div>
+            <div id="ma-fee-tab-cancel" class="fee-tab" onclick="setMAFeeTab('cancel')">Cancellation</div>
+          </div>
+          <div id="ma-fee-tns" class="card-body"><div style="font-size:28px;font-weight:600;color:#3B3B3B;margin-bottom:4px;">$119</div><div style="font-size:13px;color:#888;margin-bottom:8px;">Saturdays &amp; Mondays</div><div style="font-size:12px;color:#888;">Late cancel: <strong style="color:#E24B4A;">$80</strong> — cancel by <strong style="color:#3B3B3B;">Tuesday</strong> of week before test via Student Portal.</div></div>
+          <div id="ma-fee-rmv" class="card-body hidden"><div style="font-size:28px;font-weight:600;color:#3B3B3B;margin-bottom:4px;">$150</div><div style="font-size:13px;color:#888;margin-bottom:8px;">Any day</div><div style="font-size:12px;color:#888;">Late cancel: <strong style="color:#E24B4A;">$80</strong> — cancel <strong style="color:#3B3B3B;">5 days in advance</strong> via Student Portal.</div></div>
+          <div id="ma-fee-cancel" class="card-body hidden">
+            <div style="font-size:11px;font-weight:600;color:#C46D10;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Test @ TNS</div>
+            <div class="kv-row"><span style="color:#888;">Cancel by</span><span style="font-weight:600;">Tuesday before test</span></div>
+            <div class="kv-row" style="border-bottom:1px solid #eee;padding-bottom:10px;margin-bottom:10px;"><span style="color:#888;">Late cancellation</span><span style="font-weight:600;color:#E24B4A;">$80 (incl. RMV fee)</span></div>
+            <div style="font-size:11px;font-weight:600;color:#1A7A96;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Meet @ RMV</div>
+            <div class="kv-row"><span style="color:#888;">Cancel by</span><span style="font-weight:600;">5 days in advance</span></div>
+            <div class="kv-row"><span style="color:#888;">Late cancellation</span><span style="font-weight:600;color:#E24B4A;">$80 (incl. RMV fee)</span></div>
+            <div class="kv-row"><span style="color:#888;">No-show (both)</span><span style="font-weight:600;color:#E24B4A;">Forfeit — no credit/refund</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="ma-content-pass" class="hidden">
+        <div style="border:1px solid #73BF45;border-radius:10px;overflow:hidden;">
+          <div style="background:#3B3B3B;padding:10px 14px;display:flex;align-items:center;gap:8px;"><div style="width:20px;height:20px;border-radius:50%;background:#73BF45;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;">&#10003;</div><span class="card-header-title">If passed — MA</span></div>
+          <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;background:#F4FBF0;">
+            <div class="bullet-row"><div class="dot" style="background:#73BF45;"></div><span>If RMV fees are prepaid through the <strong>myRMV portal at mass.gov</strong>, the RMV examiner will <strong>sign the learner's permit</strong>, which becomes the temporary license starting the next day.</span></div>
+            <div class="bullet-row"><div class="dot" style="background:#73BF45;"></div><span>The official license will be <strong>mailed to the address</strong> on the road test application form that was submitted.</span></div>
+            <div class="info-box" style="background:#fff;border-color:#c3e6a8;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10" stroke="#73BF45" stroke-width="2"/><path d="M12 8v4m0 4h.01" stroke="#73BF45" stroke-width="2" stroke-linecap="round"/></svg><span style="color:#3B6D11;">Make sure fees are paid in advance via <strong>myRMV at mass.gov</strong> before the test date.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="ma-content-fail" class="hidden">
+        <div style="border:1px solid #E24B4A;border-radius:10px;overflow:hidden;">
+          <div style="background:#3B3B3B;padding:10px 14px;display:flex;align-items:center;gap:8px;"><div style="width:20px;height:20px;border-radius:50%;background:#E24B4A;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:600;">&#10007;</div><span class="card-header-title">If failed — MA</span></div>
+          <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;background:#FFF5F5;">
+            <div class="bullet-row"><div class="dot" style="background:#E24B4A;"></div><span>Must wait <strong>2 weeks (14 days)</strong> from the test date before retesting.</span></div>
+            <div class="bullet-row"><div class="dot" style="background:#E24B4A;"></div><span>To retest with TNS, purchase the test through the <strong>Student Portal</strong>.</span></div>
+            <div class="info-box" style="background:#fff;border-color:#f5c6c6;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="#E24B4A" stroke-width="2"/><path d="M12 9v4m0 4h.01" stroke="#E24B4A" stroke-width="2" stroke-linecap="round"/></svg><span style="color:#A32D2D;">Student <strong>must pay the RMV retest fee</strong> in the <strong>myRMV portal at mass.gov</strong> before TNS can book the next road test.</span></div>
+          </div>
+          <div style="padding:12px 16px;background:#fff;border-top:1px solid #f5c6c6;">
+            <span class="field-label" style="margin-bottom:6px;">Retest date calculator</span>
+            <input type="date" id="ma-fail-date" onchange="calcMARetest()" onfocus="this.style.borderColor='#E24B4A'" onblur="this.style.borderColor='#ddd'" />
+            <div id="ma-retest-result" style="margin-top:8px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var state='CT',course='full',maTestType='tns';
+  function toggleAcc(id){var el=document.getElementById(id),chev=document.getElementById(id+'-chev'),open=el.classList.contains('hidden');el.classList.toggle('hidden',!open);if(chev)chev.textContent=open?'−':'+';}
+  function setCTTab(t){['state','tns','fees','pass','fail'].forEach(function(x){var a=x===t;document.getElementById('ct-tab-'+x).classList.toggle('active',a);document.getElementById('ct-content-'+x).classList.toggle('hidden',!a);});}
+  function setMATab(t){['state','tns','fees','pass','fail'].forEach(function(x){var a=x===t;document.getElementById('ma-tab-'+x).classList.toggle('active',a);document.getElementById('ma-content-'+x).classList.toggle('hidden',!a);});}
+  function setCTFeeTab(t){['test','retest','cancel'].forEach(function(x){var a=x===t;document.getElementById('ct-fee-tab-'+x).classList.toggle('active',a);document.getElementById('ct-fee-'+x).classList.toggle('hidden',!a);});}
+  function setMAFeeTab(t){['tns','rmv','cancel'].forEach(function(x){var a=x===t;document.getElementById('ma-fee-tab-'+x).classList.toggle('active',a);document.getElementById('ma-fee-'+x).classList.toggle('hidden',!a);});}
+  function setSegActive(activeId,ids,cls){ids.forEach(function(i){var el=document.getElementById(i);el.classList.remove('active-orange','active-blue');if(i===activeId)el.classList.add(cls);});}
+  function setMATestType(t){maTestType=t;setSegActive(t==='tns'?'btn-tns':'btn-rmv',['btn-tns','btn-rmv'],'active-blue');document.getElementById('ma-day-warning').style.display=t==='tns'?'block':'none';calcMAPolicy();}
+  function setState(s){state=s;setSegActive(s==='CT'?'btn-ct':'btn-ma',['btn-ct','btn-ma'],'active-orange');document.getElementById('course-group').classList.toggle('hidden',s==='MA');document.getElementById('policy-section').classList.remove('hidden');document.getElementById('ct-policies').classList.toggle('hidden',s!=='CT');document.getElementById('ma-policies').classList.toggle('hidden',s!=='MA');calculate();}
+  function setCourse(c){course=c;setSegActive(c==='full'?'btn-full':'btn-8hr',['btn-full','btn-8hr'],'active-orange');calculate();}
+  function addDays(d,n){var r=new Date(d);r.setDate(r.getDate()+n);return r;}
+  function subtractDays(d,n){var r=new Date(d);r.setDate(r.getDate()-n);return r;}
+  function formatDate(d){return d.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});}
+  function formatShort(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+  function ageAt(dob,ref){return Math.floor((ref-dob)/(365.25*24*3600*1000));}
+  function daysUntil(t){var n=new Date();n.setHours(0,0,0,0);return Math.ceil((t-n)/(24*3600*1000));}
+  function getPrevTuesday(d){var r=new Date(d),day=r.getDay(),diff=day===2?7:(day+5)%7;r.setDate(r.getDate()-diff);return r;}
+  function statusColors(dtd){var p=dtd<0;return{bg:p?'#FFF0F0':(dtd<=2?'#FFF8EC':'#F4FBF0'),border:p?'#E24B4A':(dtd<=2?'#F58A21':'#73BF45'),color:p?'#A32D2D':(dtd<=2?'#C46D10':'#3B6D11'),status:p?'Passed':dtd+'d left'};}
+  function deadlineRow(label,dateStr,statusStr,bg,border,color){return '<div style="padding:12px 14px;border-left:4px solid '+border+';background:'+bg+';"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;"><div><div style="font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">'+label+'</div><div style="font-size:14px;font-weight:600;color:#3B3B3B;">'+dateStr+'</div></div><div style="font-size:11px;font-weight:600;color:'+color+';background:'+bg+';border:1px solid '+border+';border-radius:6px;padding:4px 8px;white-space:nowrap;">'+statusStr+'</div></div></div>';}
+  function calcCTPolicy(){var testVal=document.getElementById('test-date-ct').value,el=document.getElementById('ct-deadline-result');if(!testVal){el.innerHTML='';return;}var testDate=new Date(testVal+'T00:00:00'),today=new Date();today.setHours(0,0,0,0);if(testDate<today){el.innerHTML='<div style="font-size:13px;color:#aaa;text-align:center;padding:6px 0;">Test date is in the past.</div>';return;}var deadline=subtractDays(testDate,5),dtd=daysUntil(deadline),c=statusColors(dtd);var html='<div style="border:1px solid #ddd;border-radius:8px;overflow:hidden;">';html+=deadlineRow('Cancellation deadline',formatShort(deadline),c.status,c.bg,c.border,c.color);html+='<div style="height:1px;background:#eee;"></div>';html+=deadlineRow('Requirements deadline',formatShort(deadline),c.status,c.bg,c.border,c.color);html+='<div style="height:1px;background:#eee;"></div>';html+=deadlineRow('Min. 2-hr lesson deadline',formatShort(deadline),c.status,c.bg,c.border,c.color);html+='</div>';el.innerHTML=html;}
+  function calcCTRetest(){var v=document.getElementById('ct-fail-date').value,el=document.getElementById('ct-retest-result');if(!v){el.innerHTML='';return;}var retest=addDays(new Date(v+'T00:00:00'),14),today=new Date();today.setHours(0,0,0,0);var dtd=daysUntil(retest),isPast=retest<=today;var bg=isPast?'#F4FBF0':'#FFF5F5',border=isPast?'#73BF45':'#E24B4A',color=isPast?'#3B6D11':'#A32D2D',status=isPast?'Available now':dtd+'d away';el.innerHTML='<div style="border:1px solid '+border+';border-radius:8px;overflow:hidden;">'+deadlineRow('Earliest retest date',formatShort(retest),status,bg,border,color)+'</div>';}
+  function calcMARetest(){var v=document.getElementById('ma-fail-date').value,el=document.getElementById('ma-retest-result');if(!v){el.innerHTML='';return;}var retest=addDays(new Date(v+'T00:00:00'),14),today=new Date();today.setHours(0,0,0,0);var dtd=daysUntil(retest),isPast=retest<=today;var bg=isPast?'#F4FBF0':'#FFF5F5',border=isPast?'#73BF45':'#E24B4A',color=isPast?'#3B6D11':'#A32D2D',status=isPast?'Available now':dtd+'d away';el.innerHTML='<div style="border:1px solid '+border+';border-radius:8px;overflow:hidden;">'+deadlineRow('Earliest retest date',formatShort(retest),status,bg,border,color)+'</div>';}
+  function calcMAPolicy(){var testVal=document.getElementById('test-date-ma').value,el=document.getElementById('ma-deadline-result');if(!testVal){el.innerHTML='';return;}var testDate=new Date(testVal+'T00:00:00'),today=new Date();today.setHours(0,0,0,0);if(testDate<today){el.innerHTML='<div style="font-size:13px;color:#aaa;text-align:center;padding:6px 0;">Test date is in the past.</div>';return;}var deadline,label,note;if(maTestType==='tns'){deadline=getPrevTuesday(testDate);label='Cancellation deadline (Tuesday)';var dow=testDate.toLocaleDateString('en-US',{weekday:'long'});note=dow+' test — cancel by '+formatShort(deadline)+' to avoid $80 fee.';}else{deadline=subtractDays(testDate,5);label='Cancellation deadline (5 days prior)';note='Cancel by '+formatShort(deadline)+' to avoid $80 fee.';}var dtd=daysUntil(deadline),c=statusColors(dtd);el.innerHTML='<div style="border:1px solid #ddd;border-radius:8px;overflow:hidden;">'+deadlineRow(label,formatShort(deadline),c.status,c.bg,c.border,c.color)+'</div><div style="font-size:12px;color:'+c.color+';margin-top:6px;padding-left:2px;">'+note+'</div>';}
+  function calculate(){var dobVal=document.getElementById('dob').value,permitVal=document.getElementById('permit-date').value,area=document.getElementById('result-area');if(!dobVal||!permitVal){area.innerHTML='';return;}var dob=new Date(dobVal+'T00:00:00'),permit=new Date(permitVal+'T00:00:00'),today=new Date();today.setHours(0,0,0,0);var ageOnPermit=ageAt(dob,permit),ageToday=ageAt(dob,today),eligibilityDate,holdDays,rule,extraNote;var noteEl=document.getElementById('course-note');if(state==='CT'){if(ageOnPermit>=18){holdDays=90;rule='Adult (18+) — 90-day permit hold required';if(noteEl)noteEl.textContent='Adults require the 8-hour course at minimum.';}else if(course==='full'){holdDays=120;rule='Teen with full course — 120-day hold';if(noteEl)noteEl.textContent='';}else{holdDays=180;rule='Teen with 8-hour course — 180-day hold';if(noteEl)noteEl.textContent='';}eligibilityDate=addDays(permit,holdDays);}else{if(ageOnPermit>=18){holdDays=0;rule='Adult (18+) in MA — no mandatory permit hold period';eligibilityDate=new Date(permit);}else{holdDays=184;rule='Junior operator (under 18) — 184-day permit hold required';extraNote="Also requires driver's ed certificate.";eligibilityDate=addDays(permit,holdDays);}}var alreadyEligible=eligibilityDate<=today,daysLeft=daysUntil(eligibilityDate);var cardBg=alreadyEligible?'#EDF7EE':'#FEF3E4',cardBorder=alreadyEligible?'#73BF45':'#F58A21',badgeBg=alreadyEligible?'#73BF45':'#F58A21',badgeText=alreadyEligible?'Eligible now':'Not yet eligible',accentColor=alreadyEligible?'#3B6D11':'#C46D10';var subText=!alreadyEligible?daysLeft+' day'+(daysLeft!==1?'s':'')+' remaining from today':holdDays>0?'Permit hold requirement met':'Eligible as of permit issue date';var html='<div style="background:'+cardBg+';border:2px solid '+cardBorder+';border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:10px;">';html+='<div style="display:inline-block;font-size:11px;font-weight:600;padding:4px 12px;border-radius:99px;margin-bottom:12px;background:'+badgeBg+';color:#fff;letter-spacing:0.04em;">'+badgeText+'</div>';html+='<div style="font-size:11px;font-weight:600;color:#888;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:4px;">Testing eligible date</div>';html+='<div style="font-size:24px;font-weight:600;color:#3B3B3B;margin-bottom:4px;">'+formatDate(eligibilityDate)+'</div>';html+='<div style="font-size:13px;color:'+accentColor+';font-weight:600;margin-bottom:12px;">'+subText+'</div>';html+='<div style="font-size:13px;color:#555;padding-top:12px;border-top:1px solid '+cardBorder+';opacity:0.8;">'+rule+'</div>';if(extraNote)html+='<div style="font-size:13px;color:#555;margin-top:6px;opacity:0.8;">'+extraNote+'</div>';html+='</div>';html+='<div style="display:flex;gap:10px;margin-bottom:10px;"><div style="flex:1;background:#F0EFE9;border-radius:8px;padding:10px 14px;"><div style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">Age at permit</div><div style="font-size:18px;font-weight:600;color:#3B3B3B;">'+ageOnPermit+'</div></div><div style="flex:1;background:#F0EFE9;border-radius:8px;padding:10px 14px;"><div style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">Current age</div><div style="font-size:18px;font-weight:600;color:#3B3B3B;">'+ageToday+'</div></div><div style="flex:1;background:#F0EFE9;border-radius:8px;padding:10px 14px;"><div style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">Hold period</div><div style="font-size:18px;font-weight:600;color:#3B3B3B;">'+(holdDays>0?holdDays+'d':'None')+'</div></div></div>';area.innerHTML=html;}
+  setState('CT');
+</script>
+</body>
+</html>
